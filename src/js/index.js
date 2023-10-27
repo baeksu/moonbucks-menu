@@ -6,22 +6,61 @@
 // - 메뉴가 추가되고 나면, input은 빈 값으로 초기화 한다.
 // - 사용자 입력값이 빈값이라면 추가되지 않는다.
 
+//관용적으로 $ 표시를 사용하여 querySelector 를 통해서 DOM 요소를 리턴받아온다.
+const $ = (selector) => document.querySelector(selector);
+
 /*
 브라우저가 js 파일을 불러올 때
 가장 먼저 실행되는 main 문 같은 역할
 */
 function App() {
-    //form 태그가 자동으로 전송되는걸 막아준다.
-    document.querySelector("#espresso-menu-form").addEventListener("submit", (e) => {
+    // //근데 지금 querySelector가 계속 나오다보니까 코드가 지저분해 진다. $ 를 사용해서 코드를 정리해주자.
+    // //form 태그가 자동으로 전송되는걸 막아준다.
+    // document.querySelector("#espresso-menu-form").addEventListener("submit", (e) => {
+    //     e.preventDefault();
+    // });
+
+    // //메뉴 입력을 받아야 하는데, 어느 부분(요소) 에서 받을지 결정해야 한다.
+    // document.querySelector("#espresso-menu-name").addEventListener("keypress", (e) => {
+    //     // console.log(e.key); //e.key 를 통해서 어떤 키를 눌렀는지 알 수 있다.
+    //     // console.log(document.querySelector("#espresso-menu-name").value);
+    //     if (e.key === "Enter") {
+    //         console.log(document.querySelector("#espresso-menu-name").value);
+    //     }
+    // });
+
+    $("#espresso-menu-form").addEventListener("submit", (e) => {
         e.preventDefault();
     });
 
     //메뉴 입력을 받아야 하는데, 어느 부분(요소) 에서 받을지 결정해야 한다.
-    document.querySelector("#espresso-menu-name").addEventListener("keypress", (e) => {
+    $("#espresso-menu-name").addEventListener("keypress", (e) => {
         // console.log(e.key); //e.key 를 통해서 어떤 키를 눌렀는지 알 수 있다.
         // console.log(document.querySelector("#espresso-menu-name").value);
         if (e.key === "Enter") {
-            console.log(document.querySelector("#espresso-menu-name").value);
+            const espressomenuName = $("#espresso-menu-name").value;
+            const menuItemTemplate = (espressomenuName) => {
+                return `
+                <li class="menu-list-item d-flex items-center py-2">
+                <span class="w-100 pl-2 menu-name">${espressomenuName}</span>
+                <button
+                    type="button"
+                    class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+                >
+                    수정
+                </button>
+                <button
+                    type="button"
+                    class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+                >
+                    삭제
+                </button>
+                </li>
+
+                `;
+            };
+            // $("#espresso-menu-list").innerHTML = menuItemTemplate(espressomenuName);
+            $("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressomenuName));
         }
     });
 }
