@@ -29,38 +29,79 @@ function App() {
     //     }
     // });
 
+    /*
+        <li> 가 추가 되기 전에 어떻게 수정/삭제 버튼을 클릭 할 수 있을까? 에 대한 답으로
+        부모 태그에 이벤트 리스너를 달아주면 된다. (자식요소에서 처리해야 하는 이벤트를 부모에게 위임할 수 있다)
+
+        e.target 을 하면 이벤트가 발생한 요소를 선택할 수 있는데, 이때 "classList" 속성을 이용하면
+        현재 적용되어 있는 class 들을 배열로 받을 수 있다. 여기에서 "수정" 버튼 css 가 적용되어 있는지 확인해서
+        "삭제" 버튼과 구분해줄 수 있다.
+
+        e.target.closest("li").querySelector(".menu-name") 으로
+         가장 가까운 원하는 태그에 접근할 수 있고, 쿼리셀렉터로 class 
+    */
+    $("#espresso-menu-list").addEventListener("click", (e) => {
+        if (e.target.classList.contains("menu-edit-button")) {
+            const $menuName = e.target.closest("li").querySelector(".menu-name");
+            const updatedMenuName = prompt("메뉴명을 수정해주세요", $menuName.innerText);
+            $menuName.innerText = updatedMenuName;
+        }
+    });
+
+    const addMenuName = () => {
+        //공백을 입력하면 li 추가가 되지 않도록
+        if ($("#espresso-menu-name").value === "") {
+            alert("메뉴이름을 입력해 주세요!");
+            return;
+        }
+        const espressomenuName = $("#espresso-menu-name").value;
+        const menuItemTemplate = (espressomenuName) => {
+            return `
+                    <li class="menu-list-item d-flex items-center py-2">
+                    <span class="w-100 pl-2 menu-name">${espressomenuName}</span>
+                    <button
+                        type="button"
+                        class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+                    >
+                        수정
+                    </button>
+                    <button
+                        type="button"
+                        class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+                    >
+                        삭제
+                    </button>
+                    </li>
+    
+                    `;
+        };
+        // $("#espresso-menu-list").innerHTML = menuItemTemplate(espressomenuName);
+        $("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressomenuName));
+
+        // li 개수를 카운트 하는 변수를 여기 넣어주면 된다. (메뉴 개수 카운트)
+        const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
+        $(".menu-count").innerText = `총 ${menuCount}개`;
+        $("#espresso-menu-name").value = "";
+    };
+
     $("#espresso-menu-form").addEventListener("submit", (e) => {
         e.preventDefault();
+    });
+
+    $("#espresso-menu-submit-button").addEventListener("click", () => {
+        addMenuName();
     });
 
     //메뉴 입력을 받아야 하는데, 어느 부분(요소) 에서 받을지 결정해야 한다.
     $("#espresso-menu-name").addEventListener("keypress", (e) => {
         // console.log(e.key); //e.key 를 통해서 어떤 키를 눌렀는지 알 수 있다.
         // console.log(document.querySelector("#espresso-menu-name").value);
-        if (e.key === "Enter") {
-            const espressomenuName = $("#espresso-menu-name").value;
-            const menuItemTemplate = (espressomenuName) => {
-                return `
-                <li class="menu-list-item d-flex items-center py-2">
-                <span class="w-100 pl-2 menu-name">${espressomenuName}</span>
-                <button
-                    type="button"
-                    class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-                >
-                    수정
-                </button>
-                <button
-                    type="button"
-                    class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-                >
-                    삭제
-                </button>
-                </li>
+        if (e.key !== "Enter") {
+            return;
+        }
 
-                `;
-            };
-            // $("#espresso-menu-list").innerHTML = menuItemTemplate(espressomenuName);
-            $("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressomenuName));
+        if (e.key === "Enter") {
+            addMenuName();
         }
     });
 }
