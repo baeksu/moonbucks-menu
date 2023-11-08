@@ -6,47 +6,48 @@
 // - 메뉴가 추가되고 나면, input은 빈 값으로 초기화 한다.
 // - 사용자 입력값이 빈값이라면 추가되지 않는다.
 
+//step2
+// TODO localStorage Read & Write
+// - [] localStorage에 데이터를 저장한다.
+// - [] localStorage에 있는 데이터를 읽어온다.
+
+// TODO 카테고리별 메뉴판 관리
+// - [] 에스프레소 메뉴판 관리
+// - [] 프라푸치노 메뉴판 관리
+// - [] 블렌디드 메뉴판 관리
+// - [] 티바나 메뉴판 관리
+// - [] 디저트 메뉴판 관리
+
+// TODO 페이지 접근시 최초 데이터 Read & Rendering
+// - [] 페이지에 최초로 로딩될 때 localStorage에 에스프레소 메뉴를 읽어온다.
+// - [] 에스프레소 메뉴를 페이지에 그려준다.
+
+//TODO 품절 상태 관리
+// - [] 품절 상태인 경우를 보여줄 수 있게, 품절 버튼을 추가하고 sold-out class를 추가하여 상태를 변경한다.
+// - [] 품절 버튼을 추가한다.
+// - [] 품절 버튼을 클릭하면 localStorage에 상태값이 저장된다.
+// - [] 클릭이벤트에서 가장 가까운 li태그의 class 속성 값에 sold-out을 추가한다.
+
 //관용적으로 $ 표시를 사용하여 querySelector 를 통해서 DOM 요소를 리턴받아온다.
 const $ = (selector) => document.querySelector(selector);
+
+const store = {
+    setLocalStorage(menu) {
+        localStorage.setItem("menu", JSON.stringify(menu));
+    },
+    getLocalStorage() {
+        localStorage.getItem("menu");
+    },
+};
 
 /*
 브라우저가 js 파일을 불러올 때
 가장 먼저 실행되는 main 문 같은 역할
 */
 function App() {
-    // //근데 지금 querySelector가 계속 나오다보니까 코드가 지저분해 진다. $ 를 사용해서 코드를 정리해주자.
-    // //form 태그가 자동으로 전송되는걸 막아준다.
-    // document.querySelector("#espresso-menu-form").addEventListener("submit", (e) => {
-    //     e.preventDefault();
-    // });
+    //상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
 
-    // //메뉴 입력을 받아야 하는데, 어느 부분(요소) 에서 받을지 결정해야 한다.
-    // document.querySelector("#espresso-menu-name").addEventListener("keypress", (e) => {
-    //     // console.log(e.key); //e.key 를 통해서 어떤 키를 눌렀는지 알 수 있다.
-    //     // console.log(document.querySelector("#espresso-menu-name").value);
-    //     if (e.key === "Enter") {
-    //         console.log(document.querySelector("#espresso-menu-name").value);
-    //     }
-    // });
-
-    /*
-        <li> 가 추가 되기 전에 어떻게 수정/삭제 버튼을 클릭 할 수 있을까? 에 대한 답으로
-        부모 태그에 이벤트 리스너를 달아주면 된다. (자식요소에서 처리해야 하는 이벤트를 부모에게 위임할 수 있다)
-
-        e.target 을 하면 이벤트가 발생한 요소를 선택할 수 있는데, 이때 "classList" 속성을 이용하면
-        현재 적용되어 있는 class 들을 배열로 받을 수 있다. 여기에서 "수정" 버튼 css 가 적용되어 있는지 확인해서
-        "삭제" 버튼과 구분해줄 수 있다.
-
-        e.target.closest("li").querySelector(".menu-name") 으로
-         가장 가까운 원하는 태그에 접근할 수 있고, 쿼리셀렉터로 class 
-    */
-    $("#espresso-menu-list").addEventListener("click", (e) => {
-        if (e.target.classList.contains("menu-edit-button")) {
-            const $menuName = e.target.closest("li").querySelector(".menu-name");
-            const updatedMenuName = prompt("메뉴명을 수정해주세요", $menuName.innerText);
-            $menuName.innerText = updatedMenuName;
-        }
-    });
+    this.menu = [];
 
     const addMenuName = () => {
         //공백을 입력하면 li 추가가 되지 않도록
@@ -54,35 +55,69 @@ function App() {
             alert("메뉴이름을 입력해 주세요!");
             return;
         }
-        const espressomenuName = $("#espresso-menu-name").value;
-        const menuItemTemplate = (espressomenuName) => {
-            return `
-                    <li class="menu-list-item d-flex items-center py-2">
-                    <span class="w-100 pl-2 menu-name">${espressomenuName}</span>
-                    <button
-                        type="button"
-                        class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-                    >
-                        수정
-                    </button>
-                    <button
-                        type="button"
-                        class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-                    >
-                        삭제
-                    </button>
-                    </li>
-    
-                    `;
-        };
-        // $("#espresso-menu-list").innerHTML = menuItemTemplate(espressomenuName);
-        $("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressomenuName));
 
+        //메뉴 추가
+        const espressomenuName = $("#espresso-menu-name").value;
+        this.menu.push({ name: espressomenuName });
+        const template = this.menu
+            .map((item) => {
+                return `
+            <li class="menu-list-item d-flex items-center py-2">
+            <span class="w-100 pl-2 menu-name">${item.name}</span>
+            <button
+                type="button"
+                class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+            >
+                수정
+            </button>
+            <button
+                type="button"
+                class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+            >
+                삭제
+            </button>
+            </li>
+
+            `;
+            })
+            .join("");
+
+        // $("#espresso-menu-list").innerHTML = menuItemTemplate(espressomenuName);
+        $("#espresso-menu-list").innerHTML = template;
+        updateMenuCount();
+        $("#espresso-menu-name").value = "";
+    };
+
+    const updateMenuName = (e) => {
+        //이렇게 $menuName 으로 묶어버리니까 훨씬 눈에 잘들어오게 리팩토링 할 수가 있네
+        //$menuName.innerText 로만 해주면 되네
+        const $menuName = e.target.closest("li").querySelector(".menu-name");
+        const updatedMenuName = prompt("메뉴명을 수정해주세요", $menuName.innerText);
+        $menuName.innerText = updatedMenuName;
+    };
+
+    const removeMenuName = (e) => {
+        e.target.closest("li").remove();
+        updateMenuCount();
+    };
+
+    const updateMenuCount = () => {
         // li 개수를 카운트 하는 변수를 여기 넣어주면 된다. (메뉴 개수 카운트)
         const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
         $(".menu-count").innerText = `총 ${menuCount}개`;
         $("#espresso-menu-name").value = "";
     };
+
+    $("#espresso-menu-list").addEventListener("click", (e) => {
+        if (e.target.classList.contains("menu-edit-button")) {
+            updateMenuName(e);
+        }
+
+        //삭제 버튼을 눌렀을 때
+        if (e.target.classList.contains("menu-remove-button")) {
+            removeMenuName(e);
+        }
+    });
 
     $("#espresso-menu-form").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -106,7 +141,7 @@ function App() {
     });
 }
 
-App();
+const app = new App();
 
 // TODO 메뉴 수정
 // - 메뉴의 수정 버튼클릭 이벤트를 받고, 메뉴수정하는 모달창이 뜬다
