@@ -59,10 +59,11 @@ function App() {
         //메뉴 추가
         const espressomenuName = $("#espresso-menu-name").value;
         this.menu.push({ name: espressomenuName });
+        store.setLocalStorage(this.menu);
         const template = this.menu
-            .map((item) => {
+            .map((item, index) => {
                 return `
-            <li class="menu-list-item d-flex items-center py-2">
+            <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
             <span class="w-100 pl-2 menu-name">${item.name}</span>
             <button
                 type="button"
@@ -89,10 +90,13 @@ function App() {
     };
 
     const updateMenuName = (e) => {
-        //이렇게 $menuName 으로 묶어버리니까 훨씬 눈에 잘들어오게 리팩토링 할 수가 있네
-        //$menuName.innerText 로만 해주면 되네
+        //li 태그 추가할 때 data-menu-id라는 데이터 속성을 를 추가했는데
+        // 요게 dataset 을 통해서 접근할 수 있다.
+        const menuId = e.target.closest("li").dataset.menuId;
         const $menuName = e.target.closest("li").querySelector(".menu-name");
         const updatedMenuName = prompt("메뉴명을 수정해주세요", $menuName.innerText);
+        this.menu[menuId].name = updatedMenuName;
+        store.setLocalStorage(this.menu);
         $menuName.innerText = updatedMenuName;
     };
 
